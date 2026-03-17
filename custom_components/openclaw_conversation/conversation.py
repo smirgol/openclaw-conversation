@@ -17,8 +17,10 @@ from .const import (
     CONF_API_KEY,
     CONF_BASE_URL,
     CONF_MODEL,
+    CONF_SYSTEM_PROMPT,
     CONF_TIMEOUT,
     DEFAULT_MODEL,
+    DEFAULT_SYSTEM_PROMPT,
     DEFAULT_TIMEOUT,
 )
 
@@ -60,9 +62,16 @@ class OpenClawConversationAgent(conversation.AbstractConversationAgent):
         # Add user message
         messages.append({"role": "user", "content": user_input.text})
 
-        # Call OpenClaw
+        system_prompt = self.entry.options.get(
+            CONF_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT
+        )
+        api_messages = []
+        if system_prompt:
+            api_messages.append({"role": "system", "content": system_prompt})
+        api_messages.extend(messages)
+
         try:
-            response_text = await self._call_openclaw(messages)
+            response_text = await self._call_openclaw(api_messages)
         except Exception as err:
             _LOGGER.error("Error calling OpenClaw: %s", err)
             response_text = "Erreur de communication avec OpenClaw."

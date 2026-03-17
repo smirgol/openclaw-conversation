@@ -18,5 +18,16 @@
       "invalid_auth": "Invalid API token.",
       "endpoint_disabled": "Chat Completions endpoint is not enabled on the Gateway."
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "OpenClaw Options",
+        "description": "Configure the system prompt sent with every request.",
+        "data": {
+          "system_prompt": "System Prompt"
+        }
+      }
+    }
   }
 }
