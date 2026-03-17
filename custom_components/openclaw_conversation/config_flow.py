@@ -7,14 +7,17 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
+from homeassistant.helpers.selector import TextSelector, TextSelectorConfig
 
 from .const import (
     CONF_API_KEY,
     CONF_BASE_URL,
     CONF_MODEL,
+    CONF_SYSTEM_PROMPT,
     CONF_TIMEOUT,
     DEFAULT_BASE_URL,
     DEFAULT_MODEL,
+    DEFAULT_SYSTEM_PROMPT,
     DEFAULT_TIMEOUT,
     DOMAIN,
 )
@@ -26,6 +29,12 @@ class OpenClawConversationConfigFlow(
     """Handle a config flow for OpenClaw Conversation."""
 
     VERSION = 1
+
+    @staticmethod
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> OpenClawOptionsFlowHandler:
+        return OpenClawOptionsFlowHandler()
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
@@ -99,4 +108,29 @@ class OpenClawConversationConfigFlow(
                 }
             ),
             errors=errors,
+        )
+
+
+class OpenClawOptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle OpenClaw options."""
+
+    async def async_step_init(self, user_input=None):
+        """Manage the options."""
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        current_prompt = self.config_entry.options.get(
+            CONF_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT
+        )
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_SYSTEM_PROMPT,
+                        default=current_prompt,
+                    ): TextSelector(TextSelectorConfig(multiline=True)), # type: ignore[typeddict-item]
+                }
+            ),
         )

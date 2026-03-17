@@ -10,3 +10,6 @@ CONF_TIMEOUT = "timeout"
 DEFAULT_MODEL = "openclaw"
 DEFAULT_TIMEOUT = 30
 DEFAULT_BASE_URL = "http://127.0.0.1:18789"
+
+CONF_SYSTEM_PROMPT = "system_prompt"
+DEFAULT_SYSTEM_PROMPT = "Do not use emojis"
