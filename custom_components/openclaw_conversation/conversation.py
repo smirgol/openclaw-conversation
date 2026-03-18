@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Literal
 
 import aiohttp
-
 from homeassistant.components import conversation
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -23,6 +23,11 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+def strip_emoji(text: str) -> str:
+    # Regex to match most emoji characters
+    emoji_pattern = re.compile('[\U00010000-\U0010ffff]', flags=re.UNICODE)
+    return emoji_pattern.sub(r'', text)
 
 
 class OpenClawConversationAgent(conversation.AbstractConversationAgent):
@@ -66,6 +71,9 @@ class OpenClawConversationAgent(conversation.AbstractConversationAgent):
         except Exception as err:
             _LOGGER.error("Error calling OpenClaw: %s", err)
             response_text = "Erreur de communication avec OpenClaw."
+
+        # Strip (most) emojis
+        response_text = strip_emoji(response_text)
 
         # Add assistant response to history
         messages.append({"role": "assistant", "content": response_text})
